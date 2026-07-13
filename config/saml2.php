@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use Slides\Saml2\Models\Tenant;
 
 return [
 
@@ -13,7 +14,7 @@ return [
     |
     */
 
-    'tenantModel' => Slides\Saml2\Models\Tenant::class,
+    'tenantModel' => Tenant::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -89,7 +90,6 @@ return [
     */
 
     'logoutRoute' => env('SAML2_LOGOUT_URL', '/login'),
-
 
     /*
     |--------------------------------------------------------------------------
@@ -308,7 +308,7 @@ return [
         |
         */
 
-        'wantMessagesSigned' => false,
+        'wantMessagesSigned' => env('SAML2_WANT_MESSAGES_SIGNED', false),
 
         /*
         |--------------------------------------------------------------------------
@@ -320,7 +320,7 @@ return [
         |
         */
 
-        'wantAssertionsSigned' => false,
+        'wantAssertionsSigned' => env('SAML2_WANT_ASSERTIONS_SIGNED', env('APP_ENV') === 'production'),
 
         /*
         |--------------------------------------------------------------------------

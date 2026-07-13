@@ -123,16 +123,16 @@ class EventController extends Controller
 
     public function destroy($id)
     {
-        $event = Event::withCount('mediaReleases')->findOrFail($id);
+        $event = Event::findOrFail($id);
         $user = Auth::user();
         if ($user->isUser() && $event->created_by != $user->id) {
             abort(403);
         }
 
-        if ($event->media_releases_count < 1) {
+        if ($event->status !== 'active' || $event->display_status !== 'active') {
             return redirect()
                 ->route('public.permitted-events')
-                ->withErrors(['event' => 'Only events with media release submissions can be deleted.']);
+                ->withErrors(['event' => 'Only active events can be deleted.']);
         }
 
         $event->delete();

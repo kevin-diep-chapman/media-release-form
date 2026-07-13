@@ -1,16 +1,13 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
-use App\Http\Controllers\PublicController;
 use App\Http\Controllers\MediaReleaseController;
 use App\Http\Controllers\MediaReleaseImageController;
-use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\PublicController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
 // Public home redirects to my events
 Route::get('/', function () {
@@ -18,13 +15,15 @@ Route::get('/', function () {
 });
 
 // Media Release Form Submission (AJAX)
-Route::post('/media-release', [MediaReleaseController::class, 'store'])->name('media-release.store');
+Route::post('/media-release', [MediaReleaseController::class, 'store'])
+    ->middleware('throttle:media-release')
+    ->name('media-release.store');
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
@@ -37,10 +36,6 @@ Route::middleware('auth')->group(function () {
     Route::put('/events/{id}', [EventController::class, 'update'])->name('events.update');
     Route::delete('/events/{id}', [EventController::class, 'destroy'])->name('events.destroy');
     Route::get('/events/{id}', [EventController::class, 'show'])->name('events.show');
-
-    Route::post('/chat/message', [ChatController::class, 'message'])
-        ->middleware('throttle:20,1')
-        ->name('chat.message');
 
     Route::get('/media-releases/{id}/photo', [MediaReleaseImageController::class, 'photo'])
         ->name('media-releases.photo');
@@ -55,9 +50,6 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
     Route::middleware('admin')->get('users', [UserController::class, 'index'])->name('users.index');
     Route::middleware('admin')->post('users', [UserController::class, 'store'])->name('users.store');
     Route::middleware('admin')->put('users/{user}', [UserController::class, 'update'])->name('users.update');
-    Route::middleware('admin')->get('settings', [SettingsController::class, 'index'])->name('settings.index');
-    Route::middleware('admin')->put('settings', [SettingsController::class, 'update'])->name('settings.update');
-    Route::middleware('admin')->post('settings/reindex', [SettingsController::class, 'reindex'])->name('settings.reindex');
     Route::middleware('admin')->get('users/create', function () {
         return redirect()->route('dashboard.users.index');
     });

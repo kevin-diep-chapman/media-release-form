@@ -90,12 +90,16 @@
 
     window.openCreateUserModal = function () {
         setCreateMode();
-        getModal().style.display = 'block';
+        const modal = getModal();
+        modal.style.display = 'flex';
+        document.body.classList.add('modal-open');
     };
 
     window.openEditUserModal = function (user) {
         setEditMode(user);
-        getModal().style.display = 'block';
+        const modal = getModal();
+        modal.style.display = 'flex';
+        document.body.classList.add('modal-open');
     };
 
     window.closeUserFormModal = function () {
@@ -103,6 +107,7 @@
         if (modal) {
             modal.style.display = 'none';
         }
+        document.body.classList.remove('modal-open');
         setCreateMode();
     };
 

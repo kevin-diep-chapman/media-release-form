@@ -79,12 +79,15 @@ class MediaReleaseController extends Controller
             'state' => ['nullable', Rule::in(MediaRelease::STATE_CODES)],
             'zip_code' => 'nullable|digits:5',
             'affiliation' => ['required', Rule::in(MediaRelease::AFFILIATIONS)],
-            'affiliation_details' => [
+            'affiliation_details' => array_filter([
                 Rule::requiredIf(in_array($request->affiliation, MediaRelease::AFFILIATIONS_WITH_DETAILS, true)),
                 'nullable',
                 'string',
                 'max:2000',
-            ],
+                $request->affiliation === 'Current Student'
+                    ? Rule::in(MediaRelease::STUDENT_PROGRAMS)
+                    : null,
+            ]),
             'consent_agreed' => 'nullable|boolean',
             'photo_path' => 'required',
             'signature_path' => 'required',

@@ -29,6 +29,32 @@ class MediaRelease extends Model
         'Other',
     ];
 
+    public const STUDENT_PROGRAMS = [
+        'Art & Design',
+        'Business',
+        'Communication',
+        'Computer Science',
+        'Design',
+        'Economics',
+        'Education',
+        'Engineering',
+        'Film',
+        'Finance/Accounting',
+        'Government/Political Science',
+        'Health Science',
+        'Liberal Arts',
+        'Music',
+        'Performing Arts',
+        'Pharmacy',
+        'Psychology',
+        'Public health',
+        'Research',
+        'Science',
+        'Social Science',
+        'Technology',
+        'Visual Arts',
+    ];
+
     public const STATE_CODES = [
         'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
         'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',

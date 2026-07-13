@@ -9,7 +9,7 @@
     </div>
 </div>
 
-<div id="mediaReleaseModal" class="modal-shell media-release-modal" style="display:none;">
+<div id="mediaReleaseModal" class="modal-shell media-release-modal" hidden>
     <div class="media-release-modal-card">
         <button type="button" class="modal-close" onclick="closeMediaReleaseModal()" aria-label="Close">&times;</button>
 
@@ -116,7 +116,17 @@
                     <div id="affiliationDetailsField" class="media-release-row affiliation-details-field is-hidden" hidden>
                         <div class="media-release-field">
                             <label class="media-release-field-label" id="affiliation_details_label" for="affiliation_details">Briefly describe your connection to Chapman.</label>
-                            <textarea id="affiliation_details" name="affiliation_details" rows="3"></textarea>
+                            <div id="affiliationDetailsTextareaWrap" class="affiliation-details-textarea-wrap">
+                                <textarea id="affiliation_details" name="affiliation_details" rows="3"></textarea>
+                            </div>
+                            <div id="affiliationDetailsSelectWrap" class="affiliation-details-select-wrap" hidden>
+                                <select id="affiliation_details_select">
+                                    <option value="">Select program</option>
+                                    @foreach (App\Models\MediaRelease::STUDENT_PROGRAMS as $program)
+                                        <option value="{{ $program }}">{{ $program }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <p id="affiliation_details-error" class="field-error" hidden></p>
                         </div>
                     </div>
@@ -182,9 +192,9 @@
         </form>
     </div>
 </div>
-<script src="{{ asset('js/camera.js') }}"></script>
-<script src="{{ asset('js/signature-pad.js') }}"></script>
-<script src="{{ asset('js/media-release-form.js') }}"></script>
+<script src="{{ asset('js/camera.js') }}?v={{ filemtime(public_path('js/camera.js')) }}"></script>
+<script src="{{ asset('js/signature-pad.js') }}?v={{ filemtime(public_path('js/signature-pad.js')) }}"></script>
+<script src="{{ asset('js/media-release-form.js') }}?v={{ filemtime(public_path('js/media-release-form.js')) }}"></script>
 <script>
     function resetMediaReleaseModal() {
         const form = document.getElementById('mediaReleaseForm');
@@ -210,7 +220,9 @@
 
     function showMediaReleaseForm(eventId, eventTitle) {
         resetMediaReleaseModal();
-        document.getElementById('mediaReleaseModal').style.display = 'block';
+        const modal = document.getElementById('mediaReleaseModal');
+        modal.hidden = false;
+        document.body.classList.add('modal-open');
         document.getElementById('release_event_id').value = eventId;
 
         const title = eventTitle || 'Event';
@@ -222,7 +234,9 @@
     }
 
     function closeMediaReleaseModal() {
-        document.getElementById('mediaReleaseModal').style.display = 'none';
+        const modal = document.getElementById('mediaReleaseModal');
+        modal.hidden = true;
+        document.body.classList.remove('modal-open');
         resetMediaReleaseModal();
         stopCamera();
     }

@@ -15,7 +15,7 @@
         'Other': 'Briefly describe your connection to Chapman.',
     };
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function initMediaReleaseForm() {
         const form = document.getElementById('mediaReleaseForm');
         if (!form) {
             return;
@@ -24,10 +24,43 @@
         const affiliationSelect = form.querySelector('#affiliation');
         const affiliationDetailsField = form.querySelector('#affiliationDetailsField');
         const affiliationDetailsLabel = form.querySelector('#affiliation_details_label');
-        const affiliationDetailsInput = form.querySelector('#affiliation_details');
+        const affiliationDetailsTextarea = form.querySelector('#affiliation_details');
+        const affiliationDetailsSelect = form.querySelector('#affiliation_details_select');
+        const affiliationDetailsTextareaWrap = form.querySelector('#affiliationDetailsTextareaWrap');
+        const affiliationDetailsSelectWrap = form.querySelector('#affiliationDetailsSelectWrap');
 
         function shouldShowAffiliationDetails(selected) {
             return affiliationsWithDetails.includes(selected);
+        }
+
+        function isCurrentStudent(selected) {
+            return selected === 'Current Student';
+        }
+
+        function getActiveAffiliationDetailsInput() {
+            return isCurrentStudent(affiliationSelect.value)
+                ? affiliationDetailsSelect
+                : affiliationDetailsTextarea;
+        }
+
+        function showTextareaDetails() {
+            affiliationDetailsTextareaWrap.hidden = false;
+            affiliationDetailsSelectWrap.hidden = true;
+            affiliationDetailsTextarea.disabled = false;
+            affiliationDetailsSelect.disabled = true;
+            affiliationDetailsTextarea.setAttribute('name', 'affiliation_details');
+            affiliationDetailsSelect.removeAttribute('name');
+            affiliationDetailsLabel.setAttribute('for', 'affiliation_details');
+        }
+
+        function showProgramSelect() {
+            affiliationDetailsTextareaWrap.hidden = true;
+            affiliationDetailsSelectWrap.hidden = false;
+            affiliationDetailsTextarea.disabled = true;
+            affiliationDetailsSelect.disabled = false;
+            affiliationDetailsTextarea.removeAttribute('name');
+            affiliationDetailsSelect.setAttribute('name', 'affiliation_details');
+            affiliationDetailsLabel.setAttribute('for', 'affiliation_details_select');
         }
 
         function syncAffiliationField() {
@@ -36,13 +69,24 @@
             if (!shouldShowAffiliationDetails(selected)) {
                 affiliationDetailsField.hidden = true;
                 affiliationDetailsField.classList.add('is-hidden');
-                affiliationDetailsInput.value = '';
+                affiliationDetailsTextarea.value = '';
+                affiliationDetailsSelect.value = '';
+                showTextareaDetails();
                 return;
             }
 
             affiliationDetailsField.hidden = false;
             affiliationDetailsField.classList.remove('is-hidden');
             affiliationDetailsLabel.textContent = affiliationLabels[selected] || 'Briefly describe your connection to Chapman.';
+
+            if (isCurrentStudent(selected)) {
+                affiliationDetailsTextarea.value = '';
+                showProgramSelect();
+                return;
+            }
+
+            affiliationDetailsSelect.value = '';
+            showTextareaDetails();
         }
 
         affiliationSelect?.addEventListener('change', () => {
@@ -105,11 +149,16 @@
                 },
             },
             affiliation_details: {
-                input: affiliationDetailsInput,
+                get input() {
+                    return getActiveAffiliationDetailsInput();
+                },
                 error: form.querySelector('#affiliation_details-error'),
                 validate() {
-                    if (shouldShowAffiliationDetails(affiliationSelect.value) && !this.input.value.trim()) {
-                        return 'This field is required.';
+                    const activeInput = getActiveAffiliationDetailsInput();
+                    if (shouldShowAffiliationDetails(affiliationSelect.value) && !activeInput.value.trim()) {
+                        return isCurrentStudent(affiliationSelect.value)
+                            ? 'Program name is required.'
+                            : 'This field is required.';
                     }
                     return '';
                 },
@@ -240,5 +289,11 @@
                 alert('An error occurred: ' + err.message);
             }
         });
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initMediaReleaseForm);
+    } else {
+        initMediaReleaseForm();
+    }
 })();

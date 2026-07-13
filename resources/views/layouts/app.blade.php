@@ -30,10 +30,6 @@
                             class="dashboard-nav-link @if(request()->routeIs('dashboard.users.*')) is-active @endif"
                             href="{{ route('dashboard.users.index') }}"
                         >User</a>
-                        <a
-                            class="dashboard-nav-link @if(request()->routeIs('dashboard.settings.*')) is-active @endif"
-                            href="{{ route('dashboard.settings.index') }}"
-                        >Settings</a>
                     @else
                         <span class="dashboard-nav-link dashboard-nav-link-muted">Placeholder</span>
                     @endif
@@ -61,10 +57,6 @@
 
     @include('components.site-footer')
 
-    @auth
-        @if(app(\App\Services\SettingsService::class)->isChatboxEnabled())
-            @include('components.ai-chatbox')
-        @endif
-    @endauth
+    @include('components.media-release-modal')
 </body>
 </html>

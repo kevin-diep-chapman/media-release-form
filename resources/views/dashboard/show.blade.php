@@ -73,8 +73,4 @@
             </table>
         @endif
     </section>
-
-    @if ($event->status === 'active')
-        @include('components.media-release-modal')
-    @endif
 @endsection

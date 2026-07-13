@@ -94,6 +94,7 @@
                             <td class="action-column">
                                 <div class="table-actions">
                                     @php($canAddForm = $event->status !== 'inactive' && $event->display_status !== 'inactive')
+                                    @php($canDelete = $event->status === 'active' && $event->display_status === 'active')
                                     <button
                                         type="button"
                                         class="button-add-form"
@@ -103,7 +104,7 @@
                                     >Add Form</button>
                                     <a class="button-details" href="{{ route('events.show', $event->id) }}">Details</a>
                                     <a class="button-edit" href="{{ route('events.edit', $event->id) }}">Edit</a>
-                                    @if ($event->media_releases_count > 0)
+                                    @if ($canDelete)
                                         <form
                                             method="POST"
                                             action="{{ route('events.destroy', $event->id) }}"
@@ -131,7 +132,6 @@
             </table>
         @endif
     </section>
-    @include('components.media-release-modal')
 
     @if (request()->query('success') === 'media-release')
         <script>
