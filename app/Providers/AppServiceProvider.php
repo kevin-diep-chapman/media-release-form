@@ -2,17 +2,12 @@
 
 namespace App\Providers;
 
-use App\Listeners\SamlSignedIn;
-use App\Listeners\SamlSignedOut;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Event as EventFacade;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-use Slides\Saml2\Events\SignedIn;
-use Slides\Saml2\Events\SignedOut;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -54,8 +49,5 @@ class AppServiceProvider extends ServiceProvider
 
             return $rule;
         });
-
-        EventFacade::listen(SignedIn::class, SamlSignedIn::class);
-        EventFacade::listen(SignedOut::class, SamlSignedOut::class);
     }
 }

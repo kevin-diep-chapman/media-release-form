@@ -10,6 +10,10 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Public home redirects to my events
+Route::get('/up', function () {
+    return response()->noContent();
+});
+
 Route::get('/', function () {
     return redirect('/my-events');
 });

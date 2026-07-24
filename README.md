@@ -13,7 +13,7 @@ Chapman Media is a Laravel application for Chapman University's Strategic Market
 
 ## Tech stack
 
-- [Laravel 13](https://laravel.com/) (PHP 8.3+)
+- [Laravel 10](https://laravel.com/) (PHP 8.1+)
 - Blade templates with custom CSS
 - Vite + Tailwind CSS (build tooling)
 - SQLite (local) or MySQL/MariaDB (production)

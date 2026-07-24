@@ -6,7 +6,7 @@ This guide walks through setting up the Chapman Media application locally or on 
 
 | Requirement | Version |
 |-------------|---------|
-| PHP | 8.3 or higher |
+| PHP | 8.1 or higher |
 | Composer | 2.x |
 | Node.js | 18.x or higher (20+ recommended) |
 | npm | 9.x or higher |
