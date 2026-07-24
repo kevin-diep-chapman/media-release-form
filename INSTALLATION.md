@@ -6,7 +6,7 @@ This guide walks through setting up the Chapman Media application locally or on 
 
 | Requirement | Version |
 |-------------|---------|
-| PHP | 8.1 or higher |
+| PHP | 8.1 exactly (8.1.x supported; 8.2+ not required) |
 | Composer | 2.x |
 | Node.js | 18.x or higher (20+ recommended) |
 | npm | 9.x or higher |
@@ -76,12 +76,20 @@ rm -f bootstrap/cache/packages.php bootstrap/cache/events.php
 
 ### 3. Reinstall PHP dependencies
 
-Remove the old vendor directory and lock file, then install Laravel 10 packages:
+Remove the old vendor directory, then install packages locked for PHP 8.1:
 
 ```bash
 rm -rf vendor
 composer install --no-interaction
 ```
+
+This project pins dependencies for PHP 8.1 via `composer.json` (`"platform": { "php": "8.1.0" }`). Key constraints:
+
+| Package | Version | Why |
+|---------|---------|-----|
+| `laravel/framework` | ^10.48 | Last Laravel line supporting PHP 8.1 |
+| `scaler-tech/laravel-saml2` | ^2.5 | 2.7+ requires PHP 8.2+ |
+| `laravel/pint` | ^1.13 &lt;1.21 | 1.21+ requires PHP 8.2+ |
 
 On a production server:
 
@@ -477,6 +485,27 @@ npm run build
 ```
 
 Or run `npm run dev` during development.
+
+### `composer install` fails: package requires PHP 8.2+
+
+Confirm your server runs PHP 8.1 (`php -v`), then reinstall from the lock file:
+
+```bash
+rm -rf vendor
+composer install --no-interaction
+```
+
+If Composer still resolves PHP 8.2+ packages, verify `composer.json` includes:
+
+```json
+"config": {
+    "platform": {
+        "php": "8.1.0"
+    }
+}
+```
+
+And that `scaler-tech/laravel-saml2` is constrained to `^2.5` (not `^2.7`).
 
 ### `Array to string conversion` when running `php artisan migrate`
 
