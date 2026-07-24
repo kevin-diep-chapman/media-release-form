@@ -34,6 +34,125 @@ Optional but recommended for development:
 - `intl`
 - `pcntl` (queue workers)
 
+## Upgrading an existing installation (Laravel 13 → Laravel 10)
+
+Use this section if you already installed the app on **PHP 8.3 / Laravel 13** and are moving to **PHP 8.1 / Laravel 10**. Your database and `.env` file can stay in place; you are updating the application code and PHP dependencies.
+
+### Before you start
+
+1. Confirm the server runs **PHP 8.1 or higher** (`php -v`).
+2. Back up your database and `.env` file.
+3. Put the app in maintenance mode on production:
+
+```bash
+php artisan down
+```
+
+### 1. Pull the latest code
+
+```bash
+git pull origin main
+```
+
+Use your actual branch name if different.
+
+### 2. Clear old Laravel caches
+
+Laravel 13 config and route caches are not compatible with Laravel 10. Clear them before reinstalling dependencies:
+
+```bash
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+php artisan cache:clear
+```
+
+If `php artisan` fails because the old vendor tree is broken, delete cached files manually:
+
+```bash
+rm -f bootstrap/cache/config.php bootstrap/cache/routes-v7.php bootstrap/cache/services.php
+rm -f bootstrap/cache/packages.php bootstrap/cache/events.php
+```
+
+### 3. Reinstall PHP dependencies
+
+Remove the old vendor directory and lock file, then install Laravel 10 packages:
+
+```bash
+rm -rf vendor
+composer install --no-interaction
+```
+
+On a production server:
+
+```bash
+composer install --no-dev --optimize-autoloader --no-interaction
+```
+
+### 4. Rebuild frontend assets (optional)
+
+If you use Vite for asset builds:
+
+```bash
+npm ci
+npm run build
+```
+
+The app serves CSS and JS from `public/css` and `public/js` by default, so this step is only required if you change frontend source files.
+
+### 5. Run migrations
+
+Your existing tables are kept. Only new migrations are applied:
+
+```bash
+php artisan migrate --force
+```
+
+If you see **Array to string conversion** during migrate, clear config and try again:
+
+```bash
+php artisan config:clear
+php artisan migrate --force
+```
+
+That error means a stale Laravel 13 config cache is still loaded. The current `config/database.php` uses Laravel 10 format (`'migrations' => 'migrations'`).
+
+### 6. Rebuild production caches
+
+```bash
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+### 7. Bring the app back online
+
+```bash
+php artisan up
+```
+
+### What changed in this downgrade
+
+| Area | Laravel 13 (old) | Laravel 10 (current) |
+|------|------------------|----------------------|
+| PHP | 8.3+ | 8.1+ |
+| Framework | Laravel 13 | Laravel 10 |
+| Bootstrap | `bootstrap/app.php` middleware API | `app/Http/Kernel.php` + service providers |
+| Config providers | `bootstrap/providers.php` | `config/app.php` providers list |
+| Migrations config | `'migrations' => ['table' => ...]` | `'migrations' => 'migrations'` |
+
+No database rollback is required. Data in `users`, `events`, `media_releases`, and related tables is preserved.
+
+### Verify the upgrade
+
+```bash
+php artisan --version   # Should show Laravel Framework 10.x
+php artisan test
+php artisan route:list
+```
+
+Sign in at `/login` and confirm `/my-events` loads as expected.
+
 ## Quick start (local development)
 
 From the project root:
@@ -57,7 +176,7 @@ Then start the development environment:
 composer dev
 ```
 
-This runs the web server, queue worker, log viewer, and Vite dev server together.
+This runs the web server, queue worker, and Vite dev server together.
 
 Open [http://localhost:8000](http://localhost:8000) in your browser.
 
@@ -358,6 +477,34 @@ npm run build
 ```
 
 Or run `npm run dev` during development.
+
+### `Array to string conversion` when running `php artisan migrate`
+
+This usually happens after downgrading from Laravel 13 when config is still cached or `config/database.php` still uses the Laravel 11+ migrations array format.
+
+Fix:
+
+```bash
+php artisan config:clear
+php artisan migrate --force
+```
+
+Confirm `config/database.php` contains:
+
+```php
+'migrations' => 'migrations',
+```
+
+Not an array with a `table` key.
+
+### `php artisan` commands fail immediately after `git pull`
+
+The old `vendor/` directory may still target Laravel 13. Reinstall dependencies:
+
+```bash
+rm -rf vendor
+composer install
+```
 
 ## Support
 

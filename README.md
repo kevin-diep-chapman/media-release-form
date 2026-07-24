@@ -24,6 +24,7 @@ Chapman Media is a Laravel application for Chapman University's Strategic Market
 See **[INSTALLATION.md](INSTALLATION.md)** for full setup instructions, including:
 
 - Local development quick start
+- **Upgrading from Laravel 13 / PHP 8.3 to Laravel 10 / PHP 8.1**
 - Database and environment configuration
 - SAML SSO setup
 - Mail configuration
