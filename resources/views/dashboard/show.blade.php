@@ -4,6 +4,7 @@
     <section class="card">
         <h1>{{ $event->title }}</h1>
         <p><strong>Date:</strong> {{ $event->event_date_display }}</p>
+        <p><strong>Format:</strong> {{ $event->event_format_display }}</p>
         <p><strong>Location:</strong> {{ $event->location }}</p>
         <p><strong>Status:</strong>
             <span class="status-dot status-dot-{{ $event->display_status }}">

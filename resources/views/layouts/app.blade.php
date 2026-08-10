@@ -58,5 +58,6 @@
     @include('components.site-footer')
 
     @include('components.media-release-modal')
+    @include('components.print-form-link-modal')
 </body>
 </html>

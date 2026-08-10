@@ -11,6 +11,7 @@
         <label for="description">Description</label>
         <textarea id="description" name="description"></textarea>
         <p id="description-error" class="field-error" hidden></p>
+        @include('components.event-format-fields')
         @include('components.event-date-fields', [
             'minDate' => \Carbon\Carbon::now('America/Los_Angeles')->toDateString(),
         ])

@@ -7,6 +7,7 @@
     const eventDateInput = form.querySelector('#event_date');
     const eventEndDateInput = form.querySelector('#event_end_date');
     const dateTypeInputs = form.querySelectorAll('input[name="date_type"]');
+    const eventFormatInputs = form.querySelectorAll('input[name="event_format"]');
     const minDate = eventDateInput?.min || getTodayPacific();
 
     function getTodayPacific() {
@@ -36,6 +37,16 @@
             validate() {
                 if (!descriptionInput.value.trim()) {
                     return 'Description is required.';
+                }
+                return '';
+            },
+        },
+        eventFormat: {
+            input: eventFormatInputs[0],
+            error: form.querySelector('#event-format-error'),
+            validate() {
+                if (!form.querySelector('input[name="event_format"]:checked')) {
+                    return 'Please select whether this event is for in person or print.';
                 }
                 return '';
             },
@@ -122,6 +133,10 @@
     });
 
     dateTypeInputs.forEach((input) => {
+        input.addEventListener('change', clearErrors);
+    });
+
+    eventFormatInputs.forEach((input) => {
         input.addEventListener('change', clearErrors);
     });
 })();

@@ -24,6 +24,20 @@
 
     <h1 class="media-release-title">{{ $release->full_name }}'s {{ $release->event->title }} Submission</h1>
 
+    @if (session('success'))
+        <section class="card dashboard-alert dashboard-alert-success">
+            <p>{{ session('success') }}</p>
+        </section>
+    @endif
+
+    @if ($errors->any())
+        <section class="card dashboard-alert dashboard-alert-error">
+            @foreach ($errors->all() as $error)
+                <p>{{ $error }}</p>
+            @endforeach
+        </section>
+    @endif
+
     <div class="media-release-detail">
         <div class="media-release-detail-hero">
             <div class="media-release-photo-panel">
@@ -33,6 +47,30 @@
                     </div>
                 @else
                     <div class="media-release-photo-box media-release-photo-empty">No photo</div>
+                @endif
+
+                @if ($release->event->isPrintFormat())
+                    <form
+                        class="media-release-attach-photo-form"
+                        method="POST"
+                        action="{{ route('dashboard.media-releases.attach-photo', $release->id) }}"
+                        enctype="multipart/form-data"
+                    >
+                        @csrf
+                        <label class="media-release-attach-photo-label" for="attach_photo">
+                            {{ $release->hasPhoto() ? 'Replace photo' : 'Attach photo' }}
+                        </label>
+                        <input
+                            id="attach_photo"
+                            type="file"
+                            name="photo"
+                            accept="image/jpeg,image/png,image/webp"
+                            required
+                        >
+                        <button type="submit" class="media-release-photo-trigger">
+                            {{ $release->hasPhoto() ? 'Upload New Photo' : 'Attach Photo' }}
+                        </button>
+                    </form>
                 @endif
             </div>
 
@@ -91,16 +129,12 @@
                 </div>
             </div>
 
-            <div class="media-release-row media-release-row-2">
+            <div class="media-release-row">
                 <div class="media-release-field">
                     <span class="media-release-field-label">Consent Agreed?</span>
                     <div class="media-release-value @unless($release->consent_agreed) media-release-value-no @endunless">
                         {{ $release->consent_agreed ? 'Yes' : 'No' }}
                     </div>
-                </div>
-                <div class="media-release-field">
-                    <span class="media-release-field-label">IP Address</span>
-                    <div class="media-release-value">{{ $release->ip_address ?: '—' }}</div>
                 </div>
             </div>
 
@@ -108,6 +142,13 @@
                 <div class="media-release-field">
                     <span class="media-release-field-label">Event</span>
                     <div class="media-release-value">{{ $release->event->title }}</div>
+                </div>
+            </div>
+
+            <div class="media-release-row">
+                <div class="media-release-field">
+                    <span class="media-release-field-label">Form Type</span>
+                    <div class="media-release-value">{{ $release->event->event_format_display }}</div>
                 </div>
             </div>
         </div>

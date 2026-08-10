@@ -68,6 +68,7 @@
                             </a>
                         </th>
                         <th>Event/Form Name</th>
+                        <th>Form Type</th>
                         <th class="action-column">Action</th>
                     </tr>
                 </thead>
@@ -78,6 +79,7 @@
                             <td>{{ $release->last_name ?: '—' }}</td>
                             <td>{{ $release->submitted_at_display }}</td>
                             <td>{{ $release->event->title }}</td>
+                            <td>{{ $release->event->event_format_display }}</td>
                             <td class="action-column">
                                 <a class="button-details" href="{{ route('dashboard.media-releases.show', $release->id) }}">View</a>
                             </td>

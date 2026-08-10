@@ -23,6 +23,9 @@ Route::post('/media-release', [MediaReleaseController::class, 'store'])
     ->middleware('throttle:media-release')
     ->name('media-release.store');
 
+Route::get('/forms/{token}', [MediaReleaseController::class, 'showPublicForm'])
+    ->name('media-release.public-form');
+
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
@@ -58,4 +61,5 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
         return redirect()->route('dashboard.users.index');
     });
     Route::get('media-releases/{id}', [MediaReleaseController::class, 'show'])->name('media-releases.show');
+    Route::post('media-releases/{id}/photo', [MediaReleaseController::class, 'attachPhoto'])->name('media-releases.attach-photo');
 });

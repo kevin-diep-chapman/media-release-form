@@ -83,6 +83,12 @@ class PublicController extends Controller
             return sprintf('%d-%s', $statusOrder, $event->event_date->toDateString());
         })->values();
 
+        $events->each(function (Event $event) {
+            if ($event->isPrintFormat()) {
+                $event->ensureFormToken();
+            }
+        });
+
         return view('public.permitted-events', compact('events', 'search', 'dateFrom', 'dateTo'));
     }
 }

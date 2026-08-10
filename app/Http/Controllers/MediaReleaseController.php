@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\MediaReleaseConfirmationMail;
+use App\Models\Event;
 use App\Models\MediaRelease;
 use App\Services\EncryptedImageService;
 use Illuminate\Http\Request;
@@ -66,9 +67,63 @@ class MediaReleaseController extends Controller
         return view('dashboard.media-release-show', compact('release', 'nextReleaseId'));
     }
 
+    public function attachPhoto(Request $request, int $id)
+    {
+        $release = MediaRelease::with('event')->findOrFail($id);
+        $user = auth()->user();
+
+        if ($user->isUser() && $release->event->created_by != $user->id) {
+            abort(403);
+        }
+
+        if (!$release->event->isPrintFormat()) {
+            abort(403, 'Photos can only be attached to print event submissions.');
+        }
+
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,jpg,png,webp|max:10240',
+        ]);
+
+        try {
+            $photo = $this->images->fromUploadedFile($request->file('photo'));
+        } catch (\InvalidArgumentException $exception) {
+            throw ValidationException::withMessages([
+                'photo' => $exception->getMessage(),
+            ]);
+        }
+
+        $release->update([
+            'photo_path' => null,
+            'photo_encrypted' => $this->images->encryptBinary($photo['binary']),
+            'photo_mime' => $photo['mime'],
+        ]);
+
+        return redirect()
+            ->route('dashboard.media-releases.show', $release->id)
+            ->with('success', 'Photo attached successfully.');
+    }
+
+    public function showPublicForm(string $token)
+    {
+        $event = Event::where('form_token', $token)->firstOrFail();
+
+        if (!$event->isPrintFormat()) {
+            abort(404);
+        }
+
+        if (!$event->acceptsPublicSubmissions()) {
+            return view('public.media-release-form-closed', compact('event'));
+        }
+
+        return view('public.media-release-form', compact('event'));
+    }
+
     public function store(Request $request)
     {
-        $request->validate([
+        $event = Event::findOrFail($request->input('event_id'));
+        $isPrintEvent = $event->isPrintFormat();
+
+        $rules = [
             'event_id' => 'required|exists:events,id',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -89,13 +144,35 @@ class MediaReleaseController extends Controller
                     : null,
             ]),
             'consent_agreed' => 'nullable|boolean',
-            'photo_path' => 'required',
             'signature_path' => 'required',
-        ]);
+        ];
 
-        try {
-            $photo = $this->images->fromDataUrl($request->input('photo_path'));
-        } catch (\InvalidArgumentException) {
+        if (!$isPrintEvent) {
+            $rules['photo_path'] = 'required';
+        }
+
+        $request->validate($rules);
+
+        if (!$event->acceptsPublicSubmissions()) {
+            throw ValidationException::withMessages([
+                'event_id' => 'This event is not accepting submissions.',
+            ]);
+        }
+
+        $photoEncrypted = null;
+        $photoMime = null;
+
+        if ($request->filled('photo_path')) {
+            try {
+                $photo = $this->images->fromDataUrl($request->input('photo_path'));
+                $photoEncrypted = $this->images->encryptBinary($photo['binary']);
+                $photoMime = $photo['mime'];
+            } catch (\InvalidArgumentException) {
+                throw ValidationException::withMessages([
+                    'photo_path' => 'A valid photo is required.',
+                ]);
+            }
+        } elseif (!$isPrintEvent) {
             throw ValidationException::withMessages([
                 'photo_path' => 'A valid photo is required.',
             ]);
@@ -125,8 +202,8 @@ class MediaReleaseController extends Controller
                 ? $request->affiliation_details
                 : null,
             'photo_path' => null,
-            'photo_encrypted' => $this->images->encryptBinary($photo['binary']),
-            'photo_mime' => $photo['mime'],
+            'photo_encrypted' => $photoEncrypted,
+            'photo_mime' => $photoMime,
             'signature_path' => null,
             'signature_encrypted' => $this->images->encryptBinary($signature['binary']),
             'signature_mime' => $signature['mime'],

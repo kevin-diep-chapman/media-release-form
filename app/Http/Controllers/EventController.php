@@ -20,12 +20,15 @@ class EventController extends Controller
         $event = Event::create([
             'title' => $request->title,
             'description' => $request->description,
+            'event_format' => $validated['event_format'],
             'event_date' => $validated['event_date'],
             'event_end_date' => $validated['event_end_date'],
             'location' => '',
             'status' => 'active',
             'created_by' => Auth::id(),
         ]);
+
+        $event->ensureFormToken();
 
         return redirect()->route('public.permitted-events')->with('success', 'Event created successfully!');
     }
@@ -79,11 +82,14 @@ class EventController extends Controller
         $event->update([
             'title' => $request->title,
             'description' => $request->description,
+            'event_format' => $validated['event_format'],
             'event_date' => $validated['event_date'],
             'event_end_date' => $validated['event_end_date'],
             'location' => $request->location,
             'status' => $request->status,
         ]);
+
+        $event->ensureFormToken();
 
         return redirect()->route('public.permitted-events')->with('success', 'Event updated successfully!');
     }
@@ -103,6 +109,7 @@ class EventController extends Controller
         $rules = [
             'title' => 'required',
             'description' => 'required',
+            'event_format' => 'required|in:in_person,print',
             'date_type' => 'required|in:single,range',
             'event_date' => $eventDateRules,
             'event_end_date' => $eventEndDateRules,
@@ -116,6 +123,7 @@ class EventController extends Controller
         $request->validate($rules);
 
         return [
+            'event_format' => $request->event_format,
             'event_date' => $request->event_date,
             'event_end_date' => $request->date_type === 'range' ? $request->event_end_date : null,
         ];

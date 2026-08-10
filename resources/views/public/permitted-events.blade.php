@@ -70,6 +70,7 @@
                     <tr>
                         <th>Status</th>
                         <th>Event Name</th>
+                        <th>Format</th>
                         <th>Event Date</th>
                         <th>Number of Forms</th>
                         <th class="action-column">Action</th>
@@ -85,6 +86,7 @@
                                 </span>
                             </td>
                             <td>{{ $event->title }}</td>
+                            <td>{{ $event->event_format_display }}</td>
                             <td>{{ $event->event_date_display }}</td>
                             <td>
                                 <span class="form-count-badge" aria-label="{{ $event->media_releases_count }} forms submitted">
@@ -95,13 +97,18 @@
                                 <div class="table-actions">
                                     @php($canAddForm = $event->status !== 'inactive' && $event->display_status !== 'inactive')
                                     @php($canDelete = $event->status === 'active' && $event->display_status === 'active')
+                                    @php($isPrintEvent = $event->isPrintFormat())
                                     <button
                                         type="button"
                                         class="button-add-form"
                                         @disabled(!$canAddForm)
-                                        @if ($canAddForm) onclick="showMediaReleaseForm({{ $event->id }}, @js($event->title))" @endif
+                                        @if ($canAddForm && $isPrintEvent)
+                                            onclick="showPrintFormLink(@js($event->public_form_url), @js($event->title))"
+                                        @elseif ($canAddForm)
+                                            onclick="showMediaReleaseForm({{ $event->id }}, @js($event->title))"
+                                        @endif
                                         @if (!$canAddForm) title="This event is inactive and not accepting forms" @endif
-                                    >Add Form</button>
+                                    >{{ $isPrintEvent ? 'Form Link' : 'Add Form' }}</button>
                                     <a class="button-details" href="{{ route('events.show', $event->id) }}">Details</a>
                                     <a class="button-edit" href="{{ route('events.edit', $event->id) }}">Edit</a>
                                     @if ($canDelete)

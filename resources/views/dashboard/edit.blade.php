@@ -10,6 +10,9 @@
         <input id="title" type="text" name="title" value="{{ $event->title }}" required>
         <label for="description">Description</label>
         <textarea id="description" name="description" required>{{ $event->description }}</textarea>
+        @include('components.event-format-fields', [
+            'eventFormat' => $event->event_format,
+        ])
         @include('components.event-date-fields', [
             'dateType' => $event->event_end_date ? 'range' : 'single',
             'eventDate' => $event->event_date->format('Y-m-d'),

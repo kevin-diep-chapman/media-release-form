@@ -21,6 +21,9 @@
             return;
         }
 
+        const requirePhoto = form.dataset.requirePhoto !== 'false' && form.dataset.requirePhoto !== '0';
+        const isPublicForm = form.dataset.isPublic === 'true' || form.dataset.isPublic === '1';
+
         const affiliationSelect = form.querySelector('#affiliation');
         const affiliationDetailsField = form.querySelector('#affiliationDetailsField');
         const affiliationDetailsLabel = form.querySelector('#affiliation_details_label');
@@ -174,16 +177,6 @@
                     return '';
                 },
             },
-            photo_path: {
-                input: form.querySelector('#photo_path'),
-                error: form.querySelector('#photo_path-error'),
-                validate() {
-                    if (!this.input.value) {
-                        return 'Photo is required.';
-                    }
-                    return '';
-                },
-            },
             signature_path: {
                 input: form.querySelector('#signature_path'),
                 error: form.querySelector('#signature_path-error'),
@@ -195,6 +188,19 @@
                 },
             },
         };
+
+        if (requirePhoto) {
+            fields.photo_path = {
+                input: form.querySelector('#photo_path'),
+                error: form.querySelector('#photo_path-error'),
+                validate() {
+                    if (!this.input?.value) {
+                        return 'Photo is required.';
+                    }
+                    return '';
+                },
+            };
+        }
 
         function clearErrors() {
             Object.values(fields).forEach(({ input, error }) => {
@@ -267,13 +273,21 @@
                 });
 
                 if (res.ok) {
-                    const redirectUrl = form.dataset.successRedirect || '/media/public/my-events';
+                    const redirectUrl = form.dataset.successRedirect || '/my-events';
                     const successTarget = `${redirectUrl}${redirectUrl.includes('?') ? '&' : '?'}success=media-release`;
 
                     form.reset();
                     syncAffiliationField();
-                    closeMediaReleaseModal();
-                    showMediaReleaseSuccessToast();
+                    window.clearSignaturePad?.();
+                    window.initSignaturePad?.();
+
+                    if (isPublicForm) {
+                        window.location.href = successTarget;
+                        return;
+                    }
+
+                    closeMediaReleaseModal?.();
+                    showMediaReleaseSuccessToast?.();
 
                     window.setTimeout(() => {
                         window.location.href = successTarget;

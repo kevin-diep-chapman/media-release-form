@@ -33,6 +33,29 @@ class EncryptedImageService
         return Crypt::encryptString(base64_encode($binary));
     }
 
+    /**
+     * @return array{binary: string, mime: string}
+     */
+    public function fromUploadedFile(\Illuminate\Http\UploadedFile $file): array
+    {
+        $binary = file_get_contents($file->getRealPath());
+
+        if ($binary === false) {
+            throw new InvalidArgumentException('Unable to read uploaded image.');
+        }
+
+        $mime = strtolower($file->getMimeType() ?: 'image/jpeg');
+
+        if (! str_starts_with($mime, 'image/')) {
+            throw new InvalidArgumentException('Uploaded file must be an image.');
+        }
+
+        return [
+            'binary' => $binary,
+            'mime' => $mime,
+        ];
+    }
+
     public function decryptToBinary(string $encrypted): string
     {
         $decoded = base64_decode(Crypt::decryptString($encrypted), true);

@@ -554,6 +554,59 @@ body.modal-open {
     box-shadow: var(--shadow-soft);
 }
 
+.print-form-link-modal .print-form-link-modal-card {
+    width: min(100%, 36rem);
+    max-height: none;
+    background: #ffffff;
+}
+
+.print-form-link-intro {
+    margin: 0 0 1rem;
+    color: rgba(35, 31, 32, 0.72);
+}
+
+.print-form-link-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+    color: var(--primary-dark);
+}
+
+.print-form-link-input {
+    width: 100%;
+    margin-bottom: 0.75rem;
+    background: #ffffff;
+}
+
+.print-form-link-status {
+    margin: 0 0 0.75rem;
+    color: var(--primary-red);
+    font-weight: 600;
+}
+
+.print-form-link-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.media-release-attach-photo-form {
+    display: grid;
+    gap: 0.5rem;
+    width: min(100%, 220px);
+}
+
+.media-release-attach-photo-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.media-release-attach-photo-form input[type="file"] {
+    font-size: 0.82rem;
+}
+
 .media-release-breadcrumbs {
     display: flex;
     flex-wrap: wrap;
@@ -2028,4 +2081,17 @@ body.dashboard-shell {
     .dashboard-table .table-actions {
         flex-wrap: nowrap;
     }
+}
+
+.media-release-public-card {
+    max-width: 48rem;
+}
+
+.media-release-public-intro {
+    margin: 0 0 1rem;
+    color: var(--text-muted, #555);
+}
+
+.media-release-form-public .media-release-form-actions {
+    margin-top: 1rem;
 }
